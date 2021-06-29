@@ -6,7 +6,7 @@ import numpy as np
 from gym.vector.utils import spaces
 from gym.wrappers import Monitor
 from matplotlib import pyplot as plt
-from stable_baselines import TRPO, results_plotter
+from stable_baselines import PPO2, results_plotter, ACKTR, A2C, PPO1
 from stable_baselines.bench import load_results
 from stable_baselines.common.callbacks import BaseCallback
 from stable_baselines.common.evaluation import evaluate_policy
@@ -42,13 +42,16 @@ class Station:
 
 class BikesEnv(gym.Env):
 
-    def __init__(self, stations, bikes_in_circulation, max_hourly_customers):
+    def __init__(self, stations, bikes_in_circulation, max_hourly_customers, model_name):
         super(BikesEnv, self).__init__()
 
         # Save Params
         self.bikes_in_circulation = bikes_in_circulation
         self.max_hourly_customers = max_hourly_customers
         self.hour = 0
+
+        self.data_file = open(("data/" + model_name + ".txt"), "w")
+        self.temp_day_reward = 0
 
         self.action_space = spaces.Box(np.array([-1, -1, -1, -1, -1]), np.array([+1, +1, +1, +1, +1]))
         self.observation_space = spaces.Box(np.array([-1, -1, -1, -1, -1]), np.array([+20, +20, +20, +20, +20]))
@@ -132,12 +135,14 @@ class BikesEnv(gym.Env):
                         self.stations[start_station_location+1].take_bike()
                         bikes_moving += 1
 
-        hourly_success = (numb_of_users - failed_transactions)/ (numb_of_users + 0.0)
+        hourly_success = (numb_of_users - failed_transactions) / (numb_of_users + 0.0)
         obser = self.get_state()
         if self.hour >= 12:
             done = True
         else:
             done = False
+
+        self.temp_day_reward += hourly_success
 
         return np.array(obser), hourly_success, done, {"info": "yo"}
 
@@ -148,6 +153,10 @@ class BikesEnv(gym.Env):
         return bikes
 
     def reset(self):
+
+        self.data_file.write((str(self.temp_day_reward)+ "\n"))
+        self.temp_day_reward = 0
+
         self.hour = 0
         for st in self.stations:
             st.clear()
@@ -203,40 +212,19 @@ class SaveOnBestTrainingRewardCallback(BaseCallback):
         return True
 
 
-# Create log dir
-log_dir = "tmp/"
-os.makedirs(log_dir, exist_ok=True)
-
 # Create environment
 print("env")
-env = BikesEnv(5, 15, 15)
-env = Monitor(env, log_dir, force=True)
-
+env = BikesEnv(5, 15, 15, "PPO1-01")
 
 # Instantiate the agent
 print("model")
-model = TRPO('MlpPolicy', env, verbose=1)
-
-#callback
-print("callback")
-callback = SaveOnBestTrainingRewardCallback(check_freq=1000, log_dir=log_dir)
+model = PPO1('MlpPolicy', env, verbose=1)
 
 # Train the agent
 print("learn")
 timesteps = int(2e5)
 model.learn(total_timesteps=timesteps)
 
-print('plot')
-results_plotter.plot_results([log_dir], timesteps, results_plotter.X_TIMESTEPS, "trpo Bikes?")
-plt.show()
-
 mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=10)
 print(mean_reward)
 
-# Enjoy trained agent
-obs = env.reset()
-done = False
-while not done:
-    action, _states = model.predict(obs)
-    obs, rewards, done, info = env.step(action)
-    env.render()
