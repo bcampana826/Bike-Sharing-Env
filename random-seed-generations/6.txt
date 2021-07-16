@@ -1,0 +1,4 @@
+1-Dimensional Bike Env Seed *WORK PREDICTION* 6 generated at 2021-07-15 15:35:00.587017
+10,400,40,60
+[3, 2, 4, 6, 6, 6, 1, 4, 2, 6]
+Hour: 0; (0,1) 
