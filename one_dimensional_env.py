@@ -6,6 +6,8 @@ import gym
 import numpy as np
 from gym.vector.utils import spaces
 
+from bikes import seed_generation
+
 
 class Station:
 
@@ -52,7 +54,7 @@ class BikesEnv(gym.Env):
     def __init__(self, seed_number, model_name):
 
         if seed_number is -1:
-            self.seed_file = open(("random-seed-generations/" + str(BikesEnv.generator_seed()) + ".txt"), "r")
+            self.seed_file = open(("random-seed-generations/" + str(seed_generation.generator_seed()) + ".txt"), "r")
         else:
             self.seed_file = open(("random-seed-generations/" + str(seed_number) + ".txt"), "r")
 
@@ -94,42 +96,6 @@ class BikesEnv(gym.Env):
         self.stations = []
         for station in range(self.number_of_stations):
             self.stations.append(Station(self.starting_stations[station]))
-
-    @classmethod
-    def generator_seed(cls, number_of_stations, daily_budget, bikes_in_circulation, max_hourly_customers):
-
-        # Data Saving Setup
-        seed_number = len(os.listdir('random-seed-generations')) + 1
-        data_file = open(("random-seed-generations/" + str(seed_number) + ".txt"), "w")
-
-        data_file.write(
-            "1-Dimensional Bike Env Seed " + str(seed_number) + " generated at " + str(datetime.datetime.now()) + "\n")
-        data_file.write(str(number_of_stations) + "," + str(daily_budget) + "," + str(bikes_in_circulation) + "," + str(
-            max_hourly_customers) + "\n")
-
-        # Generate Bike Start Locations
-        bike_locations = [0] * number_of_stations
-        for bike in range(bikes_in_circulation):
-            bike_locations[random.randint(0, len(bike_locations) - 1)] += 1
-
-        data_file.write(str(bike_locations) + "\n")
-
-        # Generate Trips for all 12 Hours
-        for hour in range(12):
-            data_file.write("Hour: " + str(hour) + "; ")
-
-            # Generate Trips in this Hour
-            number_of_trips = random.randint(1, max_hourly_customers)
-
-            for trip in range(number_of_trips):
-                data_file.write("(" + str(random.randint(0, number_of_stations - 1)) + "," + str(
-                    random.randint(0, number_of_stations - 1)) + ") ")
-
-            data_file.write(";" + "\n")
-
-        data_file.close()
-
-        return seed_number
 
     def reset(self):
 

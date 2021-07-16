@@ -1,10 +1,15 @@
 from stable_baselines import A2C, PPO2, TRPO, PPO1, ACKTR
 from stable_baselines.common.evaluation import evaluate_policy
+
+from bikes import seed_generation
 from one_dimensional_env import BikesEnv
+
+#seed_generation.generate_working_prediction_seed(400, 40, 60)
+
 
 # Create environment
 print("env")
-env = BikesEnv(3, "ACKTR")
+env = BikesEnv(7, "ACKTR2-Work")
 
 # Instantiate the agent
 print("model")

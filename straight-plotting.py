@@ -6,7 +6,7 @@ plt.plot(trpo_file, color='blue')
 plt.title("TRPO")
 plt.show()
 
-ppo2_file = open("1-dim-results/PPO2.txt")
+ppo2_file = open("1-dim-results/PPO2-Work.txt")
 ppo2_file = [float(n) for n in ppo2_file]
 plt.plot(ppo2_file, color='orange')
 plt.title("PPO2")
