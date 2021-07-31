@@ -9,11 +9,11 @@ from one_dimensional_env import BikesEnv
 
 # Create environment
 print("env")
-env = BikesEnv(7, "ACKTR2-Work")
+env = BikesEnv(7, "No Training")
 
 # Instantiate the agent
 print("model")
-model = ACKTR('MlpPolicy', env, verbose=1)
+model = TRPO('MlpPolicy', env, verbose=1)
 
 mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10)
 print(mean_reward)

@@ -69,11 +69,15 @@ class BikesEnv(gym.Env):
         for value in range(len(self.starting_stations)):
             self.starting_stations[value] = int(self.starting_stations[value].strip().strip('[').strip(']'))
 
+        self.day_successful_trips = 0
+        self.day_trips = 0
+
         # Saving Trips
         self.trips = []
         for hour in range(12):
             self.trips.append(
                 run_info[hour + 3][run_info[hour + 3].index(";") + 1:run_info[hour + 3].rindex(";")].split())
+            self.day_trips += len(self.trips[hour])
             for trip in range(len(self.trips[hour])):
                 self.trips[hour][trip] = BikeTrip(self.trips[hour][trip])
 
@@ -99,9 +103,13 @@ class BikesEnv(gym.Env):
 
     def reset(self):
 
-        self.env_data.write((str(self.temp_day_reward) + "\n"))
+        data = float(self.day_successful_trips) / float(self.day_trips)
+
+        self.env_data.write((str(data) + "\n"))
         self.temp_day_reward = 0
         self.temp_day_budget = self.daily_budget
+
+        self.day_successful_trips = 0
 
         self.hour = 0
         for st in range(len(self.stations)):
@@ -115,6 +123,10 @@ class BikesEnv(gym.Env):
         failed_transactions = 0
 
         successful_trips = []
+
+        # USE FOR TESTING BASELINE
+        # action = [0,0,0,0,0,0,0,0,0,0]
+
 
         # Iterate through the trips
         for trip in range(len(trips)):
@@ -130,6 +142,8 @@ class BikesEnv(gym.Env):
             obser = self.get_state()
 
         self.temp_day_reward += hourly_success
+
+        self.day_successful_trips += len(successful_trips)
 
         for finishing_trips in range(len(successful_trips)):
             self.stations[successful_trips[finishing_trips].get_end_location()].add_bike()
