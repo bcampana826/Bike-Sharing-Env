@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-trpo_file = open("1-dim-results/TRPO-Percents.txt")
+trpo_file = open("2-dim-results/TRPO-2d.txt")
 trpo_file = [float(n) for n in trpo_file]
 print(trpo_file[1])
 trpo_plot = []
@@ -15,7 +15,7 @@ for n in range(len(trpo_file)):
         trpo_plot.append(round((temp_reward/10.0),3)*100)
         temp_reward = 0
 
-PPO2_file = open("1-dim-results/PPO2-Percents.txt")
+PPO2_file = open("2-dim-results/PPO2-2d.txt")
 PPO2_file = [float(n) for n in PPO2_file]
 print(PPO2_file[1])
 PPO2_plot = []
@@ -30,7 +30,7 @@ for n in range(len(PPO2_file)):
         PPO2_plot.append(round((temp_reward/10.0),3)*100)
         temp_reward = 0
 
-ACKTR_file = open("1-dim-results/ACKTR-Percents.txt")
+ACKTR_file = open("2-dim-results/ACKTR-2d.txt")
 ACKTR_file = [float(n) for n in ACKTR_file]
 print(ACKTR_file[1])
 ACKTR_plot = []
@@ -45,7 +45,7 @@ for n in range(len(ACKTR_file)):
         ACKTR_plot.append(round((temp_reward/10.0),3)*100)
         temp_reward = 0
 
-A2C_file = open("1-dim-results/A2C-Percents.txt")
+A2C_file = open("2-dim-results/A2C-2d.txt")
 A2C_file = [float(n) for n in A2C_file]
 print(A2C_file[1])
 A2C_plot = []
@@ -60,7 +60,7 @@ for n in range(len(A2C_file)):
         A2C_plot.append(round((temp_reward/10.0),3)*100)
         temp_reward = 0
 
-nothing = open("1-dim-results/No Training.txt")
+nothing = open("2-dim-results/No Incentive.txt")
 nothing = [float(n) for n in nothing]
 print(nothing[1])
 nothing_plot = []
